@@ -49,6 +49,7 @@ return function (App $app) {
         $items = $ftp->scanDir($dirValue);
         $result = array();
         
+        var_dump($items);
         foreach ($items as $item) {
             if ($simpleMode == '1') {
                 array_splice($item, 0, 4);
