@@ -39,40 +39,44 @@ return function (App $app) {
         $dirValue = isset($args['dir']) ? $args['dir'] : '/';
         $simpleMode = isset($args['simpleMode']) ? $args['simpleMode'] : '1';
         
+        // $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
+        // $body->getBody()->write('----');
+        // $body->getBody()->write($hostValue);
+
+        // $body->getBody()->write('----');
+        // $body->getBody()->write($useSSL);
+
+        // $body->getBody()->write('----');
+        // $body->getBody()->write($portValue);
+
+        // $body->getBody()->write('----');
+        // $body->getBody()->write($dirValue);
+
+        // $body->getBody()->write('----');
+        // $body->getBody()->write($simpleMode);
+
+        // $body->getBody()->write('----');
+        // $body->getBody()->write($username);
+
+        // $body->getBody()->write('----');
+        // $body->getBody()->write($password);
+        
+
+        //Coonect on FTP
+        $ftp = new \FtpClient\FtpClient();
+        $ftp->connect($hostValue, $useSSL == '1' , $portValue);
+
+        $ftp->login($username, $password);
+        
+        //If success, List all files
+        $items = $ftp->scanDir($dirValue);
+
         $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
-        $body->getBody()->write('----');
-        $body->getBody()->write($hostValue);
-
-        $body->getBody()->write('----');
-        $body->getBody()->write($useSSL);
-
-        $body->getBody()->write('----');
-        $body->getBody()->write($portValue);
-
-        $body->getBody()->write('----');
-        $body->getBody()->write($dirValue);
-
-        $body->getBody()->write('----');
-        $body->getBody()->write($simpleMode);
-
-        $body->getBody()->write('----');
-        $body->getBody()->write($username);
-
-        $body->getBody()->write('----');
-        $body->getBody()->write($password);
         
+        $body->getBody()->write(var_dump($items));
 
-        // //Coonect on FTP
-        // $ftp = new \FtpClient\FtpClient();
-        // $ftp->connect($hostValue, $useSSL == '1' , $portValue);
-
-        // $ftp->login($username, $password);
-        
-        // //If success, List all files
-        // $items = $ftp->scanDir($dirValue);
         // $result = array();
         
-        // var_dump($items);
         // foreach ($items as $item) {
         //     if ($simpleMode == '1') {
         //         array_splice($item, 0, 4);
