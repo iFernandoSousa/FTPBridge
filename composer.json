@@ -1,9 +1,9 @@
 {
-    "name": "slim/slim-skeleton",
-    "description": "A Slim Framework skeleton application for rapid development",
-    "keywords": ["microframework", "rest", "router", "psr7"],
-    "homepage": "http://github.com/slimphp/Slim-Skeleton",
-    "license": "MIT",
+    "name": "FTP Bridge",
+    "description": "Allow connect any FTP using just REST API",
+    "keywords": ["ftp-cliet", "rest-api"],
+    "homepage": "https://github.com/iFernandoSousa/FTPBridge",
+    "license": "GPL-3.0",
     "authors": [
         {
             "name": "Fernando Sousa",
@@ -38,7 +38,7 @@
         "sort-packages": true
     },
     "scripts": {
-        "start": "php -S localhost:8080 -t public",
+        "start": "php -S localhost -t public",
         "test": "phpunit"
     }
 }
