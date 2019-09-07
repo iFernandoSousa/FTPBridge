@@ -39,40 +39,51 @@ return function (App $app) {
         $dirValue = isset($args['dir']) ? $args['dir'] : '/';
         $simpleMode = isset($args['simpleMode']) ? $args['simpleMode'] : '1';
         
-        //Coonect on FTP
-        $ftp = new \FtpClient\FtpClient();
-        $ftp->connect($hostValue, $useSSL == '1' , $portValue);
+        $body->getBody()->write('----');
+        $body->getBody()->write($hostValue);
 
-        $ftp->login($username, $password);
+        $body->getBody()->write('----');
+        $body->getBody()->write($useSSL);
+
+        $body->getBody()->write('----');
+        $body->getBody()->write($portValue);
+
+        $body->getBody()->write('----');
+        $body->getBody()->write($dirValue);
+
+        $body->getBody()->write('----');
+        $body->getBody()->write($simpleMode);
+
+        $body->getBody()->write('----');
+        $body->getBody()->write($username);
+
+        $body->getBody()->write('----');
+        $body->getBody()->write($password);
+
+        // //Coonect on FTP
+        // $ftp = new \FtpClient\FtpClient();
+        // $ftp->connect($hostValue, $useSSL == '1' , $portValue);
+
+        // $ftp->login($username, $password);
         
-        //If success, List all files
-        $items = $ftp->scanDir($dirValue);
-        $result = array();
+        // //If success, List all files
+        // $items = $ftp->scanDir($dirValue);
+        // $result = array();
         
-        var_dump($items);
-        foreach ($items as $item) {
-            if ($simpleMode == '1') {
-                array_splice($item, 0, 4);
-            } 
+        // var_dump($items);
+        // foreach ($items as $item) {
+        //     if ($simpleMode == '1') {
+        //         array_splice($item, 0, 4);
+        //     } 
 
-            array_push($result, $item);
-        }
+        //     array_push($result, $item);
+        // }
 
-        $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
-        $body->getBody()->rewind(); // Replace contents instead of trying to append
-        $body->getBody()->write(json_encode($result));
+        // $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
+        // $body->getBody()->rewind(); // Replace contents instead of trying to append
+        // $body->getBody()->write(json_encode($result));
         
-        //Return Json of this files
-        return $body;
-
-        //$response = $response->withJson(json_encode($result));
-
-
-        //return $response;
+        // //Return Json of this files
+        // return $body;
     });
-
-    // $app->group('/users', function (Group $group) use ($container) {
-    //     $group->get('', ListUsersAction::class);
-    //     $group->get('/{id}', ViewUserAction::class);
-    // });
 };
