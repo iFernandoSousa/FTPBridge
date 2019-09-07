@@ -39,6 +39,7 @@ return function (App $app) {
         $dirValue = isset($args['dir']) ? $args['dir'] : '/';
         $simpleMode = isset($args['simpleMode']) ? $args['simpleMode'] : '1';
         
+        $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
         $body->getBody()->write('----');
         $body->getBody()->write($hostValue);
 
@@ -59,6 +60,7 @@ return function (App $app) {
 
         $body->getBody()->write('----');
         $body->getBody()->write($password);
+        
 
         // //Coonect on FTP
         // $ftp = new \FtpClient\FtpClient();
@@ -84,6 +86,6 @@ return function (App $app) {
         // $body->getBody()->write(json_encode($result));
         
         // //Return Json of this files
-        // return $body;
+        return $body;
     });
 };
