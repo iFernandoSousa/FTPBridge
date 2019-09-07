@@ -73,8 +73,11 @@ return function (App $app) {
 
         $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
         
-        $body->getBody()->write(var_dump($items));
-
+        try {
+            $body->getBody()->write(json_encode($items));
+        } catch(Exception $e) {
+            $body->getBody()->write($e);
+        }
         // $result = array();
         
         // foreach ($items as $item) {
