@@ -14,10 +14,58 @@ return function (App $app) {
         return $response;
     });
 
-    $app->get('/v1/list', function(Request $request, Response $response){
+    $app->get('/v1/download', function(Request $request, Response $response){
         $args = $request->getQueryParams();
+
+        if (!isset($args['file'])) {
+            $response = $response->withStatus(400);
+            return $response;
+        }
         
         $authUser = $request->getHeaderLine('Authorization');
+
+        if (empty($authUser)) {
+            $response = $response->withStatus(401);
+            return $response;
+        }
+
+        $decoded = base64_decode(str_replace ('Basic ', '', $authUser));
+        $authUser = explode(':', $decoded);
+
+        if (empty($authUser)) {
+            $response = $response->withStatus(401);
+            return $response;
+        }
+        $username = $authUser[0];
+        $password = $authUser[1];
+
+        $hostValue = isset($args['host']) ? $args['host'] : 'localhost';
+        $useSSL = isset($args['ssl']) ? $args['ssl'] : '0';
+        $portValue = isset($args['port']) ? $args['port'] : '21';
+        $file = $args['file'];
+
+        //Coonect on FTP
+        $ftp = new \FtpClient\FtpClient();
+        $ftp->connect($hostValue, $useSSL == '1' , $portValue);
+        $ftp->login($username, $password);
+        
+        //If success, List all files
+        $fileContent = $ftp->getContent($file);
+
+        
+        $body = $response->withHeader('Content-Type','application/octet-stream;charset=utf-8');
+        $body->getBody()->rewind(); // Replace contents instead of trying to append
+        $body->getBody()->write($fileContent);
+        
+        // //Return Json of this files
+        return $body;
+    });
+
+    $app->get('/v1/list', function(Request $request, Response $response){
+        $args = $request->getQueryParams();
+
+        $authUser = $request->getHeaderLine('Authorization');
+
         if (empty($authUser)) {
             $response = $response->withStatus(401);
             return $response;
@@ -39,8 +87,9 @@ return function (App $app) {
         $dirValue = isset($args['dir']) ? $args['dir'] : '/';
         $simpleMode = isset($args['simpleMode']) ? $args['simpleMode'] : '1';
         
-        // $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
-        // $body->getBody()->write('----');
+        
+		// $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
+		// $body->getBody()->write('----');
         // $body->getBody()->write($hostValue);
 
         // $body->getBody()->write('----');
@@ -65,32 +114,30 @@ return function (App $app) {
         //Coonect on FTP
         $ftp = new \FtpClient\FtpClient();
         $ftp->connect($hostValue, $useSSL == '1' , $portValue);
-
         $ftp->login($username, $password);
         
         //If success, List all files
         $items = $ftp->scanDir($dirValue);
+        //$ftp->quit();
+        $result = array();
+        
+        foreach ($items as $item) {
+            if ($simpleMode == '1') {
+                if ($item['type'] == 'link')
+                    continue;
+                    
+                array_splice($item, 0, 4);
+            } 
+
+            if ($item['type'] == 'link' || $item['type'] == 'directory')
+                $item['size'] = '--';
+
+            array_push($result, $item);
+        }
 
         $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
-        
-        try {
-            $body->getBody()->write(json_encode($items));
-        } catch(Exception $e) {
-            $body->getBody()->write($e);
-        }
-        // $result = array();
-        
-        // foreach ($items as $item) {
-        //     if ($simpleMode == '1') {
-        //         array_splice($item, 0, 4);
-        //     } 
-
-        //     array_push($result, $item);
-        // }
-
-        // $body = $response->withHeader('Content-Type','application/json;charset=utf-8');
-        // $body->getBody()->rewind(); // Replace contents instead of trying to append
-        // $body->getBody()->write(json_encode($result));
+        $body->getBody()->rewind(); // Replace contents instead of trying to append
+        $body->getBody()->write(json_encode($result));
         
         // //Return Json of this files
         return $body;
